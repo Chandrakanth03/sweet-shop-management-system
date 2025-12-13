@@ -23,6 +23,21 @@ public class AuthService {
 
         return userRepository.save(user);
     }
+    public User login(AuthRequest request) {
+
+        User user = userRepository.findByUsername(request.getUsername());
+
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        if (!user.getPassword().equals(request.getPassword())) {
+            throw new UserNotFoundException("Invalid username or password");
+        }
+
+        return user;
+    }
+
 
 }
 
