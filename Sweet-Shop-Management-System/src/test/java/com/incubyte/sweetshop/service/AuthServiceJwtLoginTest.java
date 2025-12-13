@@ -25,8 +25,6 @@ class AuthServiceJwtLoginTest {
 
         User user = new User("john", "password");
         when(userRepository.findByUsername("john")).thenReturn(user);
-
-        // Act
         AuthResponse response = authService.loginAndGenerateToken(request);
 
         // Assert

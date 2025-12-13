@@ -7,7 +7,10 @@ import io.jsonwebtoken.security.Keys;
 
 import java.security.Key;
 import java.util.Date;
+import io.jsonwebtoken.Claims;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JwtUtil {
 
     // Secure key (256-bit) for HS256
@@ -21,4 +24,27 @@ public class JwtUtil {
                 .signWith(secretKey)
                 .compact();
     }
+
+
+    public String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            extractAllClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
 }
