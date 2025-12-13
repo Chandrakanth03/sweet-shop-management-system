@@ -23,6 +23,8 @@ class AuthServiceTest {
         request.setPassword("password");
 
         when(userRepository.existsByUsername("john")).thenReturn(false);
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));  // <-- added this
 
         // Act
         User savedUser = authService.register(request);
@@ -31,6 +33,7 @@ class AuthServiceTest {
         assertNotNull(savedUser);
         assertEquals("john", savedUser.getUsername());
     }
+
 
     @Test
     void shouldThrowExceptionWhenUserAlreadyExists() {
