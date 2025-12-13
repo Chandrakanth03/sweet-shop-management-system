@@ -1,50 +1,43 @@
 package com.incubyte.sweetshop.config;
 
-import com.incubyte.sweetshop.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import io.jsonwebtoken.Claims;
-import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
 
-    // Secure key (256-bit) for HS256
-    private final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    public String generateToken(User user) {
+    public String generateToken(String username) {
+
         return Jwts.builder()
-                .setSubject(user.getUsername())
+                .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
-                .signWith(secretKey)
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .signWith(key)
                 .compact();
     }
 
-
     public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
-    public boolean isTokenValid(String token) {
+    public boolean validateToken(String token) {
         try {
-            extractAllClaims(token);
+            extractUsername(token);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
-
-    private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
 }

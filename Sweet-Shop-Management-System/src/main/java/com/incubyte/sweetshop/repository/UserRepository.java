@@ -1,9 +1,13 @@
 package com.incubyte.sweetshop.repository;
 
 import com.incubyte.sweetshop.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository {
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+
     boolean existsByUsername(String username);
-    User save(User user);
-    User findByUsername(String username);  // <-- add this
+
+    User findByUsername(String username);
 }
