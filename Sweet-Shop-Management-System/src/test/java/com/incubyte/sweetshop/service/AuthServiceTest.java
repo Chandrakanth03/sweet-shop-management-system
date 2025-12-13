@@ -1,11 +1,11 @@
 package com.incubyte.sweetshop.service;
 
+import com.incubyte.sweetshop.config.JwtUtil;
 import com.incubyte.sweetshop.dto.RegisterRequest;
 import com.incubyte.sweetshop.entity.User;
 import com.incubyte.sweetshop.exception.UserAlreadyExistsException;
 import com.incubyte.sweetshop.repository.UserRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -16,7 +16,9 @@ class AuthServiceTest {
     void shouldRegisterNewUserSuccessfully() {
         // Arrange
         UserRepository userRepository = mock(UserRepository.class);
-        AuthService authService = new AuthService(userRepository);
+        JwtUtil jwtUtil = mock(JwtUtil.class);
+
+        AuthService authService = new AuthService(userRepository, jwtUtil);
 
         RegisterRequest request = new RegisterRequest();
         request.setUsername("john");
@@ -39,7 +41,10 @@ class AuthServiceTest {
     void shouldThrowExceptionWhenUserAlreadyExists() {
         // Arrange
         UserRepository userRepository = mock(UserRepository.class);
-        AuthService authService = new AuthService(userRepository);
+        JwtUtil jwtUtil = mock(JwtUtil.class);
+
+        AuthService authService = new AuthService(userRepository, jwtUtil);
+
 
         RegisterRequest request = new RegisterRequest();
         request.setUsername("john");

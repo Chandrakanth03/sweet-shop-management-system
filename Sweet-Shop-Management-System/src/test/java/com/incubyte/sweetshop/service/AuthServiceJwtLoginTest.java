@@ -1,42 +1,37 @@
 package com.incubyte.sweetshop.service;
 
+import com.incubyte.sweetshop.config.JwtUtil;
 import com.incubyte.sweetshop.dto.AuthRequest;
 import com.incubyte.sweetshop.dto.AuthResponse;
 import com.incubyte.sweetshop.entity.User;
-import com.incubyte.sweetshop.exception.UserNotFoundException;
 import com.incubyte.sweetshop.repository.UserRepository;
 import org.junit.jupiter.api.Test;
-import com.incubyte.sweetshop.config.JwtUtil;
-import com.incubyte.sweetshop.service.AuthService;
-
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class AuthServiceLoginTest {
+class AuthServiceJwtLoginTest {
 
     @Test
-    void shouldLoginUserSuccessfully() {
+    void shouldReturnJwtTokenOnSuccessfulLogin() {
         // Arrange
         UserRepository userRepository = mock(UserRepository.class);
-        JwtUtil jwtUtil = mock(JwtUtil.class);
-
+        JwtUtil jwtUtil = new JwtUtil();
         AuthService authService = new AuthService(userRepository, jwtUtil);
-
 
         AuthRequest request = new AuthRequest();
         request.setUsername("john");
         request.setPassword("password");
 
-        User storedUser = new User("john", "password");
-
-        when(userRepository.findByUsername("john")).thenReturn(storedUser);
+        User user = new User("john", "password");
+        when(userRepository.findByUsername("john")).thenReturn(user);
 
         // Act
-        AuthResponse loggedInUser = authService.loginAndGenerateToken(request);
+        AuthResponse response = authService.loginAndGenerateToken(request);
 
         // Assert
-        assertNotNull(loggedInUser);
-        assertEquals("john", loggedInUser.getUsername());
+        assertNotNull(response);
+        assertNotNull(response.getUsername());
+        assertTrue(response.getUsername().length() > 10);
     }
 }

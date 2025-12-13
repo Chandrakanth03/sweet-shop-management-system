@@ -1,46 +1,44 @@
 package com.incubyte.sweetshop.service;
 
+import com.incubyte.sweetshop.config.JwtUtil;
+import com.incubyte.sweetshop.dto.AuthRequest;
+import com.incubyte.sweetshop.dto.AuthResponse;
+import com.incubyte.sweetshop.entity.User;
+import com.incubyte.sweetshop.repository.UserRepository;
 import com.incubyte.sweetshop.dto.RegisterRequest;
 import com.incubyte.sweetshop.entity.User;
-import com.incubyte.sweetshop.exception.UserAlreadyExistsException;
-import com.incubyte.sweetshop.repository.UserRepository;
-import com.incubyte.sweetshop.exception.UserNotFoundException;
-import com.incubyte.sweetshop.dto.AuthRequest;
 
 
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserRepository userRepository, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
-    public User register(RegisterRequest request) {
+    public AuthResponse loginAndGenerateToken(AuthRequest request) {
+        User user = userRepository.findByUsername(request.getUsername());
 
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UserAlreadyExistsException("User already exists");
+        if (user == null || !user.getPassword().equals(request.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
         }
 
-        User user = new User(request.getUsername(), request.getPassword());
+        String token = jwtUtil.generateToken(user);
+        return new AuthResponse(token);
+    }
+    public User register(RegisterRequest request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("User already exists");
+        }
+
+        User user = new User(
+                request.getUsername(),
+                request.getPassword()
+        );
 
         return userRepository.save(user);
     }
-    public User login(AuthRequest request) {
-
-        User user = userRepository.findByUsername(request.getUsername());
-
-        if (user == null) {
-            throw new UserNotFoundException("User not found");
-        }
-
-        if (!user.getPassword().equals(request.getPassword())) {
-            throw new UserNotFoundException("Invalid username or password");
-        }
-
-        return user;
-    }
-
-
 }
-
