@@ -4,6 +4,9 @@ import com.incubyte.sweetshop.dto.RegisterRequest;
 import com.incubyte.sweetshop.entity.User;
 import com.incubyte.sweetshop.exception.UserAlreadyExistsException;
 import com.incubyte.sweetshop.repository.UserRepository;
+import com.incubyte.sweetshop.exception.UserNotFoundException;
+import com.incubyte.sweetshop.dto.AuthRequest;
+
 
 public class AuthService {
 
